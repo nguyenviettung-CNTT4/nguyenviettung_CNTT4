@@ -1,0 +1,26 @@
+=============================================================================
+HƯỚNG DẪN NHANH KHỞI CHẠY BÀI KIỂM TRA MÔN TRÍ TUỆ NHÂN TẠO
+Đề tài: AI Dự đoán nguy cơ bệnh tiểu đường từ thông số sức khỏe
+=============================================================================
+
+1. CÀI ĐẶT THƯ VIỆN (Nếu máy tính chưa có):
+   py -m pip install -r requirements.txt
+
+2. CHẠY TOÀN BỘ QUY TRÌNH HỌC MÁY (BƯỚC 1 -> BƯỚC 6):
+   py main.py
+   (Quy trình sẽ tự động làm sạch dữ liệu, chuẩn hóa, chia tập 70-15-15, 
+    huấn luyện 4 mô hình, đánh giá trên tập Test độc lập và xuất 4 biểu đồ 
+    khoa học vào thư mục visualizations/).
+
+3. KHỞI CHẠY GIAO DIỆN (BƯỚC 7):
+   - Cách 1: Giao diện Desktop GUI (Khuyên dùng):
+     py app_gui.py
+
+   - Cách 2: Giao diện Web:
+     py app_web.py
+     (Sau đó mở trình duyệt tại: http://localhost:5000)
+
+4. BÁO CÁO GIẢI THÍCH CHI TIẾT VÀ KẾT QUẢ ĐÁNH GIÁ:
+   - Mở file Word: GiaiThich_Va_HuongDan_ThucHien.docx
+   - Hoặc file Markdown: GiaiThich_Va_HuongDan_ThucHien.md
+=============================================================================

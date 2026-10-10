@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống AI Dự Đoán Nguy Cơ Tiểu Đường - Trí Tuệ Nhân Tạo</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 14px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 25px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-ai {
+            background: #ede9fe;
+            color: #6d28d9;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sample-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sample {
+            flex: 1;
+            min-width: 130px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sample:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .btn-sample.red:hover { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+        .btn-sample.green:hover { background: #d1fae5; border-color: #10b981; color: #047857; }
+        .btn-sample.yellow:hover { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 550px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            padding: 13px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(3, 105, 161, 0.25);
+        }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        /* Result Panel */
+        .result-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .result-empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
+
+        .result-box {
+            display: none;
+        }
+
+        .result-card-banner {
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 18px;
+            border: 1px solid transparent;
+        }
+
+        .result-card-banner.danger {
+            background-color: var(--danger-bg);
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .result-card-banner.success {
+            background-color: var(--success-bg);
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+
+        .result-card-banner.warning {
+            background-color: var(--warning-bg);
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .result-main-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .risk-bar-container {
+            margin: 15px 0 10px 0;
+            background: #e2e8f0;
+            height: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .risk-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-sub {
+            margin-top: 18px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 14px;
+        }
+
+        .section-sub h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .warning-item {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 12px;
+            font-size: 13px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            color: #78350f;
+        }
+
+        .warning-item.danger-alert {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .explain-item {
+            background: #f8fafc;
+            border-left: 4px solid #0284c7;
+            padding: 10px 12px;
+            font-size: 13px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            color: #1e293b;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HỆ THỐNG AI DỰ ĐOÁN NGUY CƠ TIỂU ĐƯỜNG</h1>
+        <p>Môn học: Trí Tuệ Nhân Tạo | Machine Learning Hỗ Trợ Ra Quyết Định Y Khoa Từ Dữ Liệu Xét Nghiệm Thực Tế</p>
+    </header>
+
+    <div class="container">
+        <!-- CỘT 1: FORM NHẬP -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📝 Thông Tin Người Bệnh</div>
+                <span class="badge-ai">13 Chỉ Số Sinh Hóa</span>
+            </div>
+
+            <!-- Ca bệnh mẫu -->
+            <div class="sample-buttons">
+                <button type="button" class="btn-sample red" onclick="loadSample('diabetes')">⚡ Ca Nguy Cơ Cao</button>
+                <button type="button" class="btn-sample green" onclick="loadSample('healthy')">⚡ Ca Khỏe Mạnh</button>
+                <button type="button" class="btn-sample yellow" onclick="loadSample('prediabetes')">⚡ Ca Tiền ĐTĐ</button>
+            </div>
+
+            <form id="predictForm" onsubmit="handlePredict(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="Tuoi">Tuổi (năm)</label>
+                        <input type="number" step="1" min="1" max="110" id="Tuoi" name="Tuoi" class="form-control" value="55" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="GioiTinh">Giới tính</label>
+                        <select id="GioiTinh" name="GioiTinh" class="form-control" required>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Glucose">Glucose (mmol/L)</label>
+                        <input type="number" step="0.1" id="Glucose" name="Glucose" class="form-control" value="6.5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="HbA1C">HbA1c (%)</label>
+                        <input type="number" step="0.01" id="HbA1C" name="HbA1C" class="form-control" value="6.2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Cholesterol">Cholesterol TP (mmol/L)</label>
+                        <input type="number" step="0.1" id="Cholesterol" name="Cholesterol" class="form-control" value="5.4" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="HDL">HDL-C Tốt (mmol/L)</label>
+                        <input type="number" step="0.1" id="HDL" name="HDL" class="form-control" value="1.2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="LDL">LDL-C Xấu (mmol/L)</label>
+                        <input type="number" step="0.1" id="LDL" name="LDL" class="form-control" value="3.5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Triglycerid">Triglycerid (mmol/L)</label>
+                        <input type="number" step="0.1" id="Triglycerid" name="Triglycerid" class="form-control" value="2.3" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Creatinine">Creatinine (µmol/L)</label>
+                        <input type="number" step="0.1" id="Creatinine" name="Creatinine" class="form-control" value="85.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Ure">Ure máu (mmol/L)</label>
+                        <input type="number" step="0.1" id="Ure" name="Ure" class="form-control" value="5.6" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="AcidUric">Acid Uric (µmol/L)</label>
+                        <input type="number" step="0.1" id="AcidUric" name="AcidUric" class="form-control" value="380.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="AST">Men gan AST (U/L)</label>
+                        <input type="number" step="0.1" id="AST" name="AST" class="form-control" value="28.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ALT">Men gan ALT (U/L)</label>
+                        <input type="number" step="0.1" id="ALT" name="ALT" class="form-control" value="30.0" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSubmit">
+                        🚀 DỰ ĐOÁN NGUY CƠ TIỂU ĐƯỜNG BẰNG AI
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- CỘT 2: KẾT QUẢ DỰ ĐOÁN, CẢNH BÁO & GIẢI THÍCH -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📊 Kết Quả Chẩn Đoán & Khuyến Nghị</div>
+                <span class="badge-ai" id="statusBadge">Sẵn Sàng</span>
+            </div>
+
+            <div id="resultEmpty" class="result-empty">
+                <div class="result-empty-icon">🩺</div>
+                <h3>Chưa có kết quả dự đoán</h3>
+                <p>Nhập thông số sức khỏe bên trái hoặc chọn 1 ca bệnh mẫu, sau đó nhấn nút <strong>Dự đoán</strong>.</p>
+            </div>
+
+            <div id="resultBox" class="result-box">
+                <!-- Banner Kết Luận -->
+                <div id="resBanner" class="result-card-banner">
+                    <div id="resLabel" class="result-main-title">KẾT QUẢ</div>
+                    <div id="resProbText" style="font-size: 14px; font-weight: 600;">Xác suất nguy cơ: 0%</div>
+                    
+                    <div class="risk-bar-container">
+                        <div id="resRiskBar" class="risk-bar" style="width: 0%; background: #10b981;"></div>
+                    </div>
+                </div>
+
+                <!-- Cảnh Báo Lâm Sàng -->
+                <div class="section-sub">
+                    <h4>🚨 Cảnh Báo Lâm Sàng Y Tế (ADA & Bộ Y Tế)</h4>
+                    <div id="warningsContainer"></div>
+                </div>
+
+                <!-- Giải Thích AI -->
+                <div class="section-sub">
+                    <h4>🔍 Giải Thích Quyết Định Của Mô Hình Học Máy</h4>
+                    <div id="explainContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Đồ án / Bài Kiểm Tra Môn Học Trí Tuệ Nhân Tạo &copy; Machine Learning Healthcare Solution
+    </div>
+
+    <script>
+        const samples = {
+            diabetes: {
+                Tuoi: 62, GioiTinh: "Nữ", Glucose: 11.9, HbA1C: 8.0,
+                Cholesterol: 6.5, HDL: 0.9, LDL: 4.1, Triglycerid: 3.2,
+                Creatinine: 95.0, Ure: 8.2, AcidUric: 440.0, AST: 48.0, ALT: 52.0
+            },
+            healthy: {
+                Tuoi: 28, GioiTinh: "Nam", Glucose: 4.8, HbA1C: 5.1,
+                Cholesterol: 4.6, HDL: 1.6, LDL: 2.7, Triglycerid: 1.1,
+                Creatinine: 75.0, Ure: 4.5, AcidUric: 310.0, AST: 22.0, ALT: 20.0
+            },
+            prediabetes: {
+                Tuoi: 52, GioiTinh: "Nam", Glucose: 6.2, HbA1C: 6.0,
+                Cholesterol: 5.4, HDL: 1.1, LDL: 3.5, Triglycerid: 2.2,
+                Creatinine: 88.0, Ure: 5.8, AcidUric: 390.0, AST: 32.0, ALT: 35.0
+            }
+        };
+
+        function loadSample(key) {
+            const data = samples[key];
+            for (let k in data) {
+                const el = document.getElementById(k);
+                if (el) el.value = data[k];
+            }
+            // Tự động kích hoạt dự đoán sau khi chọn mẫu
+            document.getElementById("predictForm").dispatchEvent(new Event("submit"));
+        }
+
+        async function handlePredict(e) {
+            e.preventDefault();
+            const btn = document.getElementById("btnSubmit");
+            btn.innerText = "⏳ Đang phân tích dữ liệu...";
+            btn.disabled = true;
+
+            const form = document.getElementById("predictForm");
+            const formData = new FormData(form);
+            const payload = {};
+            formData.forEach((val, key) => { payload[key] = val; });
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    renderResult(data.result);
+                } else {
+                    alert("Lỗi: " + data.error);
+                }
+            } catch (err) {
+                alert("Lỗi kết nối máy chủ: " + err.message);
+            } finally {
+                btn.innerText = "🚀 DỰ ĐOÁN NGUY CƠ TIỂU ĐƯỜNG BẰNG AI";
+                btn.disabled = false;
+            }
+        }
+
+        function renderResult(res) {
+            document.getElementById("resultEmpty").style.display = "none";
+            const box = document.getElementById("resultBox");
+            box.style.display = "block";
+
+            const banner = document.getElementById("resBanner");
+            const label = document.getElementById("resLabel");
+            const probText = document.getElementById("resProbText");
+            const bar = document.getElementById("resRiskBar");
+
+            const prob = res.probability;
+            bar.style.width = prob + "%";
+
+            if (res.prediction === 1) {
+                banner.className = "result-card-banner danger";
+                label.innerText = "🚨 " + res.prediction_label;
+                probText.innerText = "Mức độ rủi ro: " + res.risk_level + " (Xác suất nguy cơ: " + prob.toFixed(1) + "%)";
+                bar.style.background = "#ef4444";
+                document.getElementById("statusBadge").innerText = "CẢNH BÁO NGUY CƠ";
+            } else if (prob >= 25) {
+                banner.className = "result-card-banner warning";
+                label.innerText = "⚠️ CẢNH BÁO TIỀN ĐÁI THÁO ĐƯỜNG";
+                probText.innerText = "Mức độ rủi ro: " + res.risk_level + " (Xác suất: " + prob.toFixed(1) + "%)";
+                bar.style.background = "#f59e0b";
+                document.getElementById("statusBadge").innerText = "TIỀN BỆNH";
+            } else {
+                banner.className = "result-card-banner success";
+                label.innerText = "✅ " + res.prediction_label;
+                probText.innerText = "Mức độ rủi ro: " + res.risk_level + " (Xác suất nguy cơ: " + prob.toFixed(1) + "%)";
+                bar.style.background = "#10b981";
+                document.getElementById("statusBadge").innerText = "AN TOÀN";
+            }
+
+            // Warnings
+            const warnDiv = document.getElementById("warningsContainer");
+            warnDiv.innerHTML = "";
+            res.warnings.forEach(w => {
+                const item = document.createElement("div");
+                item.className = w.includes("🚨") ? "warning-item danger-alert" : "warning-item";
+                item.innerText = w;
+                warnDiv.appendChild(item);
+            });
+
+            // Explanations
+            const expDiv = document.getElementById("explainContainer");
+            expDiv.innerHTML = "";
+            res.explanations.forEach(ex => {
+                const item = document.createElement("div");
+                item.className = "explain-item";
+                item.innerText = ex;
+                expDiv.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
