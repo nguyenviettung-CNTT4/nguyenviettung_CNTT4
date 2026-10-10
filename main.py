@@ -56,5 +56,18 @@ def main():
     print("  • Cách 2 (Giao diện Web): Chạy lệnh: py app_web.py (Mở http://localhost:5000)")
     print("=" * 80 + "\n")
 
+def _running_in_streamlit():
+    """Kiểm tra file đang được chạy bởi 'streamlit run' (vd: Streamlit Cloud) hay không"""
+    try:
+        from streamlit import runtime
+        return runtime.exists()
+    except Exception:
+        return False
+
 if __name__ == "__main__":
-    main()
+    if _running_in_streamlit():
+        # Trên Streamlit: hiển thị giao diện web thay vì huấn luyện lại mô hình
+        import runpy
+        runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "streamlit_app.py"))
+    else:
+        main()
