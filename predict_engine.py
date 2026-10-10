@@ -103,9 +103,10 @@ class DiabetesRiskPredictor:
         X = df_input[self.FEATURE_COLS].copy()
 
         # Tiền xử lý: Gender số hóa nếu dạng chuỗi
-        if X['GioiTinh'].dtype == object:
+        # (pandas >= 3.0 dùng kiểu 'str' thay cho 'object' nên kiểm tra theo kiểu số)
+        if not pd.api.types.is_numeric_dtype(X['GioiTinh']):
             g_str = str(X['GioiTinh'].iloc[0]).strip().lower()
-            X['GioiTinh'] = 1 if ('nam' in g_str or 'male' in g_str or g_str == '1') else 0
+            X['GioiTinh'] = 1 if g_str in ('nam', 'male', '1', '1.0') else 0
 
         # Nếu Glucose > 50 và người dùng chưa đổi đơn vị, tự động quy đổi từ mg/dL sang mmol/L
         glucose_val = float(X['Glucose'].iloc[0])
